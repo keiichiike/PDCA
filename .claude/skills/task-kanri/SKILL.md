@@ -78,6 +78,19 @@ description: 自分の業務タスク(顧客対応・資料作成・開発・メ
 
 ツールが使えないときは、その旨を1行書いて tasks.md だけでボードを作る。
 
+### クリックでチェックできるボード(Artifact)
+
+池松さんは、やったかどうかをクリックでチェックしたい。ボードを作ったら、チャットの表に加えて
+チェック用のページ **https://claude.ai/artifact/2PVoxogoYb712Xa3KKQXzW**(元ファイル `tasks/board.html`)も更新する。
+
+- 中身はページのデータベースにある(ArtifactData ツールで読み書きする)。ページの作り直しは不要。
+  - `meta/board`: `date`(例 "10/23(金)")、`updated`(作った時刻)、`free`(空き時間の一言)、`notes`(気をつけるところの配列)
+  - `items/<id>`: `order`(並び順の数値)、`section`(`today` / `gap` / `open` / `upcoming`)、`time`、`title`、`prio`、`due`、`mins`、`minimum`、`state`、`urgent`(期限が今日なら true)、`done`、`source`
+  - `upcoming` はチェックなしの予定一覧。それ以外はチェックできる。
+- **ボードを作り直す前に、必ず `done == true` の items を読む。** チェック済みのものは tasks.md で完了にし(未登録なら完了として記録だけ)、ページからは消す。チェックされていないものは新しいボードに引き継ぐ。
+- 作り直すときは、古い items を delete して新しい items を set する(batch でまとめて、既存の文書には読んだ version を if_version で付ける)。
+- 「チェックした」「ボードで付けた」と言われたら、同じように `done == true` を読んで tasks.md に反映する。
+
 ### 今日やることの選び方
 
 - 候補の順番: 期限切れ → 今日期限 → 明日期限で高優先 → 今週期限の高優先 → 進行中のもの。待ちは除く。
